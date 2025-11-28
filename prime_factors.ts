@@ -1,3 +1,23 @@
+/**
+ * Berechnet alle Primzahlen bis zu einer gegebenen Zahl.
+ */
+export function getPrimesUpTo(n: number): number[] {
+  const primes: number[] = [];
+  for (let candidate = 2; candidate <= n / 2; candidate++) {
+    let isPrime = true;
+    for (let i = 2; i < candidate; i++) {
+      if (candidate % i === 0) {
+        isPrime = false;
+        break;
+      }
+    }
+    if (isPrime) {
+      primes.push(candidate);
+    }
+  }
+  return primes;
+}
+
 export function factor(numbers: Array<number>) {
   // first, compute all the prime numbers up to each number
   const primesUpToNumber: Map<number, Array<number>> = new Map();
