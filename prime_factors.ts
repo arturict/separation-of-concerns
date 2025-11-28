@@ -48,6 +48,11 @@ export function factorize(n: number): number[] {
   return factors;
 }
 
+
+export function formatFactors(n: number, factors: number[]): string {
+  return `${n}: ${factors.join(", ")}`;
+}
+
 export function factor(numbers: Array<number>) {
   // first, compute all the prime numbers up to each number
   const primesUpToNumber: Map<number, Array<number>> = new Map();
