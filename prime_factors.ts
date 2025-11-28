@@ -3,7 +3,7 @@
  */
 export function getPrimesUpTo(n: number): number[] {
   const primes: number[] = [];
-  for (let candidate = 2; candidate <= n / 2; candidate++) {
+  for (let candidate = 2; candidate <= n; candidate++) {
     let isPrime = true;
     for (let i = 2; i < candidate; i++) {
       if (candidate % i === 0) {
@@ -43,6 +43,10 @@ export function factorize(n: number): number[] {
     } else {
       i++;
     }
+  }
+
+  if (remainder > 1) {
+    factors.push(remainder);
   }
 
   return factors;
