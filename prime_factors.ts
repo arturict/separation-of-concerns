@@ -18,6 +18,36 @@ export function getPrimesUpTo(n: number): number[] {
   return primes;
 }
 
+/**
+ * Zerlegt eine Zahl in ihre Primfaktoren.
+ */
+export function factorize(n: number): number[] {
+  if (n < 1) {
+    throw new Error("negative numbers are not supported");
+  }
+
+  const primes = getPrimesUpTo(n);
+  const factors: number[] = [];
+
+  if (primes.length === 0) {
+    factors.push(n);
+    return factors;
+  }
+
+  let remainder = n;
+  for (let i = 0; i < primes.length && remainder > 1; ) {
+    const prime = primes[i];
+    if (remainder % prime === 0) {
+      remainder /= prime;
+      factors.push(prime);
+    } else {
+      i++;
+    }
+  }
+
+  return factors;
+}
+
 export function factor(numbers: Array<number>) {
   // first, compute all the prime numbers up to each number
   const primesUpToNumber: Map<number, Array<number>> = new Map();
