@@ -49,6 +49,13 @@ export function factorize(n: number): number[] {
 }
 
 /**
+ * Formatiert eine Zahl mit ihren Primfaktoren als String.
+ */
+export function formatFactors(n: number, factors: number[]): string {
+  return `${n}: ${factors.join(", ")}`;
+}
+
+/**
  * Berechnet und gibt die Primfaktoren für mehrere Zahlen aus.
  */
 export function factor(numbers: number[]): void {
@@ -56,8 +63,4 @@ export function factor(numbers: number[]): void {
     const factors = factorize(n);
     console.log(formatFactors(n, factors));
   }
-}
-
-export function formatFactors(n: number, factors: number[]): string {
-  return `${n}: ${factors.join(", ")}`;
 }
