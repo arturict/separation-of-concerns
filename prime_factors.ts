@@ -1,18 +1,29 @@
 /**
  * Berechnet alle Primzahlen bis zu einer gegebenen Zahl.
+ * Verwendet das Sieb des Eratosthenes für bessere Performance.
  */
 export function getPrimesUpTo(n: number): number[] {
-  const primes: number[] = [];
-  for (let candidate = 2; candidate <= n; candidate++) {
-    let isPrime = true;
-    for (let i = 2; i < candidate; i++) {
-      if (candidate % i === 0) {
-        isPrime = false;
-        break;
+  if (n < 2) return [];
+
+  // Sieb des Eratosthenes: Array mit true = möglicherweise prim
+  const sieve: boolean[] = new Array(n + 1).fill(true);
+  sieve[0] = false;
+  sieve[1] = false;
+
+  // Markiere alle Vielfachen von Primzahlen als nicht-prim
+  for (let i = 2; i * i <= n; i++) {
+    if (sieve[i]) {
+      for (let j = i * i; j <= n; j += i) {
+        sieve[j] = false;
       }
     }
-    if (isPrime) {
-      primes.push(candidate);
+  }
+
+  // Sammle alle Primzahlen
+  const primes: number[] = [];
+  for (let i = 2; i <= n; i++) {
+    if (sieve[i]) {
+      primes.push(i);
     }
   }
   return primes;

@@ -1,49 +1,93 @@
-export function play(times: number) {
+/**
+ * Ergebnis eines einzelnen Monty-Hall-Spiels.
+ */
+export interface GameResult {
+  winsIfSticking: boolean;
+  winsIfChanging: boolean;
+}
+
+/**
+ * Statistik über mehrere Spiele.
+ */
+export interface SimulationResult {
+  times: number;
+  wonSticking: number;
+  wonChanging: number;
+}
+
+/**
+ * Spielt ein einzelnes Monty-Hall-Spiel.
+ * (Aspekt: Spiellogik)
+ * 
+ * @param randomFn - Optionale Zufallsfunktion für Testbarkeit (gibt 0-1 zurück)
+ */
+export function playOnce(randomFn: () => number = Math.random): GameResult {
+  // Zufällige Tür mit Preis (1, 2 oder 3)
+  const winningDoor = Math.floor(randomFn() * 3) + 1;
+  
+  // Spieler wählt zufällig eine Tür
+  const playerGuess = Math.floor(randomFn() * 3) + 1;
+  
+  // Spieler gewinnt beim Bleiben, wenn er die richtige Tür gewählt hat
+  // Spieler gewinnt beim Wechseln, wenn er die falsche Tür gewählt hat
+  return {
+    winsIfSticking: playerGuess === winningDoor,
+    winsIfChanging: playerGuess !== winningDoor,
+  };
+}
+
+/**
+ * Führt eine Simulation mit mehreren Spielen durch.
+ * (Aspekt: Simulation/Statistik)
+ * 
+ * @param times - Anzahl der Spiele
+ * @param randomFn - Optionale Zufallsfunktion für Testbarkeit
+ */
+export function simulate(times: number, randomFn: () => number = Math.random): SimulationResult {
   if (times < 0) {
     throw new Error("cannot play a negative number of times");
   }
+
   let wonSticking = 0;
   let wonChanging = 0;
+
   for (let i = 0; i < times; i++) {
-    // first, prepare the game
-    const doorsWithPrice: Map<number, boolean> = new Map([
-      [1, false],
-      [2, false],
-      [3, false],
-    ]);
-    const winningDoor = Math.floor(Math.random() * 3) + 1;
-    doorsWithPrice.set(winningDoor, true);
-
-    // second, let the player make his guess
-    const playerGuess = Math.floor(Math.random() * 3) + 1;
-
-    // third, pick a loosing door to be eliminated from the choices
-    const loosingDoor = [...doorsWithPrice.keys()].find(
-      (d) => d != winningDoor && d != playerGuess,
-    );
-
-    // fourth, count wins by 1) sticking to the initial choice, and 2) changing the initial choice
-    const winsSticking = doorsWithPrice.get(playerGuess);
-    const otherDoor: number = [...doorsWithPrice.keys()].filter(
-      (d) => d != loosingDoor && d != playerGuess,
-    )[0];
-    const winsChanging = doorsWithPrice.get(otherDoor);
-    if (winsSticking) {
+    const result = playOnce(randomFn);
+    if (result.winsIfSticking) {
       wonSticking++;
-    } else if (winsChanging) {
+    }
+    if (result.winsIfChanging) {
       wonChanging++;
     }
   }
 
-  // finally, print the statistics
-  console.log(`played ${times} times`);
-  console.log(`won ${wonSticking} times by sticking to the initial choice`);
-  console.log(`won ${wonChanging} times by changing the initial choice`);
+  return { times, wonSticking, wonChanging };
+}
+
+/**
+ * Formatiert die Simulationsergebnisse als String-Array.
+ * (Aspekt: Formatierung)
+ */
+export function formatResults(result: SimulationResult): string[] {
   const f = Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
-  console.log(
-    `sticking wins ${f.format((wonSticking / times) * 100)}% of games`,
-  );
-  console.log(
-    `changing wins ${f.format((wonChanging / times) * 100)}% of games`,
-  );
+  const stickingPercent = (result.wonSticking / result.times) * 100;
+  const changingPercent = (result.wonChanging / result.times) * 100;
+
+  return [
+    `played ${result.times} times`,
+    `won ${result.wonSticking} times by sticking to the initial choice`,
+    `won ${result.wonChanging} times by changing the initial choice`,
+    `sticking wins ${f.format(stickingPercent)}% of games`,
+    `changing wins ${f.format(changingPercent)}% of games`,
+  ];
+}
+
+/**
+ * Spielt das Monty-Hall-Spiel und gibt die Ergebnisse aus.
+ * (Aspekt: Ausgabe)
+ */
+export function play(times: number): void {
+  const result = simulate(times);
+  const lines = formatResults(result);
+  lines.forEach((line) => console.log(line));
 }
